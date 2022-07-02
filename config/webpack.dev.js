@@ -1,3 +1,5 @@
+// 开发模式下：修改了path，修改了所有的绝对路径。
+
 // Node.js的核心模块，专门用来处理文件路径
 const path = require("path");
 
@@ -7,18 +9,19 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   // 入口
-  // 相对路径和绝对路径都行
+  // 相对路径和绝对路径都行，这里推荐用相对路径，其实是和src目录同级别的，这点需要注意。
   entry: "./src/main.js",
   // 输出
   output: {
     // path: 文件输出目录，必须是绝对路径
     // path.resolve()方法返回一个绝对路径
     // __dirname 当前文件的文件夹绝对路径
-    path: path.resolve(__dirname, "dist"),
+    // path: path.resolve(__dirname, "../dist"),  // 这里必须是绝对路径
+    path: undefined,  // 开发模式没有输出，所以不用定义
     // filename: 输出文件名
     // filename: "main.js",
     filename: "static/js/main.js",
-    clean: true,  // 自动清空上次的打包结果 但是webpack4需要装一个插件
+    // clean: true,  // 自动清空上次的打包结果 但是webpack4需要装一个插件
   },
   // 加载器
   module: {
@@ -102,12 +105,14 @@ module.exports = {
   plugins: [
     new ESLintPlugin({
       // 检测哪些文件
-      context: path.resolve(__dirname, 'src')
+      // context: path.resolve(__dirname, 'src')
+      context: path.resolve(__dirname, '../src')  // 这里是绝对路径，都需要回退
     }),
     new HtmlWebpackPlugin({
       // 以 public/index.html 为模板创建文件
       // 新的html文件有两个特点：1. 内容和源文件一致 2. 自动引入打包生成的js等资源
-      template: path.resolve(__dirname, "./src/index.html"),
+      // template: path.resolve(__dirname, "./src/index.html"),
+      template: path.resolve(__dirname, "../public/index.html"),
     }),
   ],
   // 开发服务器 运行在内存中的，并没有输出
