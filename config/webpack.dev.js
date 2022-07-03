@@ -25,7 +25,10 @@ module.exports = {
     path: undefined,  // 开发模式没有输出，所以不用定义
     // filename: 输出文件名
     // filename: "main.js",
-    filename: "static/js/main.js",
+    // filename: "static/js/main.js",
+    filename: "static/js/[name].js",
+    chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    assetModuleFilename: "static/media/[name].[hash][ext]", // 图片、字体等资源命名方式（注意用hash）
     // clean: true,  // 自动清空上次的打包结果 但是webpack4需要装一个插件
   },
   // 加载器
@@ -79,21 +82,21 @@ module.exports = {
                 maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
               }
             },
-            generator: {
-              // 将图片文件输出到 static/imgs 目录中
-              // 将图片文件命名 [hash:8][ext][query]
-              // [hash:8]: hash值取8位
-              // [ext]: 使用之前的文件扩展名
-              // [query]: 添加之前的query参数
-              filename: "static/imgs/[hash:8][ext][query]",
-            },
+            // generator: {
+            //   // 将图片文件输出到 static/imgs 目录中
+            //   // 将图片文件命名 [hash:8][ext][query]
+            //   // [hash:8]: hash值取8位
+            //   // [ext]: 使用之前的文件扩展名
+            //   // [query]: 添加之前的query参数
+            //   filename: "static/imgs/[hash:8][ext][query]",
+            // },
           },
           {
             test: /\.(ttf|woff2?|mp4|mp3|avi)$/,
             type: 'asset/resource',
-            generator: {
-              filename: "static/media/[hash:8][ext][query]",
-            },
+            // generator: {
+            //   filename: "static/media/[hash:8][ext][query]",
+            // },
           },
           {
             test: /\.js$/,
