@@ -1,20 +1,11 @@
-// nodejs核心模块，直接使用
-const os = require("os");
-// cpu核数
-const threads = os.cpus().length;
-
-// Node.js的核心模块，专门用来处理文件路径
-const path = require("path");
-
+const os = require("os");  // nodejs核心模块，直接使用
+const threads = os.cpus().length;  // cpu核数
+const path = require("path");  // Node.js的核心模块，专门用来处理文件路径
 const ESLintPlugin = require('eslint-webpack-plugin');
-
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
 // 用MiniCssExtractPlugin时：需要把所有的style-loader替换为MiniCssExtractPlugin.loader
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-
 const TerserPlugin = require("terser-webpack-plugin");
 
 // 用来获取处理样式的loader
@@ -49,8 +40,9 @@ module.exports = {
     path: path.resolve(__dirname, "../dist"),
     // filename: 输出文件名
     // filename: "main.js",
-    filename: "static/js/main.js",
+    filename: "static/js/[name].js",
     chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    assetModuleFilename: "static/media/[name].[hash][ext]", // 图片、字体等资源命名方式（注意用hash）
     clean: true,  // 自动清空上次的打包结果 但是webpack4需要装一个插件
   },
   // 加载器
@@ -155,21 +147,22 @@ module.exports = {
                 maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
               }
             },
-            generator: {
-              // 将图片文件输出到 static/imgs 目录中
-              // 将图片文件命名 [hash:8][ext][query]
-              // [hash:8]: hash值取8位
-              // [ext]: 使用之前的文件扩展名
-              // [query]: 添加之前的query参数
-              filename: "static/imgs/[hash:8][ext][query]",
-            },
+            // 在上面已经配置了 assetModuleFilename
+            // generator: {
+            //   // 将图片文件输出到 static/imgs 目录中
+            //   // 将图片文件命名 [hash:8][ext][query]
+            //   // [hash:8]: hash值取8位
+            //   // [ext]: 使用之前的文件扩展名
+            //   // [query]: 添加之前的query参数
+            //   filename: "static/imgs/[hash:8][ext][query]",
+            // },
           },
           {
             test: /\.(ttf|woff2?|mp4|mp3|avi)$/,
             type: 'asset/resource',
-            generator: {
-              filename: "static/media/[hash:8][ext][query]",
-            },
+            // generator: {
+            //   filename: "static/media/[hash:8][ext][query]",
+            // },
           },
           {
             test: /\.js$/,
@@ -218,7 +211,8 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       // 自定义输出css文件的目录
-      filename: "static/css/main.css"
+      filename: "static/css/[name].css",
+      chunkFilename: "static/css/[name].chunk.css"
     }),
     // // 下面的这几行也可以写在外面： optimization
     // // css压缩
