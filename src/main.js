@@ -1,5 +1,6 @@
 import count from './js/count';
 import sum from './js/sum';
+import { mul } from './js/math';
 
 import './css/index.css';
 import './css/iconfont.css';
@@ -12,6 +13,8 @@ import './stylus/index.styl';
 
 // let r = count(5, 5);
 // console.log(r);
+
+console.log(mul(9, 8));
 
 console.log(count(5, 6));
 console.log(sum(5, 6));

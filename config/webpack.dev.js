@@ -2,7 +2,6 @@
 const os = require("os");
 // cpu核数
 const threads = os.cpus().length;
-const TerserPlugin = require("terser-webpack-plugin");
 
 // 开发模式下：修改了path，修改了所有的绝对路径。
 
@@ -124,6 +123,7 @@ module.exports = {
                   // presets: ['@babel/preset-env']
                   cacheDirectory: true, // 开启babel编译缓存
                   cacheCompression: false, // 缓存文件不要压缩
+                  plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积
                 }
               }
             ]
