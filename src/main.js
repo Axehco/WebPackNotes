@@ -15,3 +15,8 @@ import './stylus/index.styl';
 
 console.log(count(5, 6));
 console.log(sum(5, 6));
+
+if (module.hot) {
+  module.hot.accept('./js/count');
+  module.hot.accept('./js/sum');
+}
