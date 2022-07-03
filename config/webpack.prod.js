@@ -5,6 +5,30 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// 用MiniCssExtractPlugin时：需要把所有的style-loader替换为MiniCssExtractPlugin.loader
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
+// 用来获取处理样式的loader
+function getStyleLoaders(pre) {
+  return [
+    MiniCssExtractPlugin.loader,
+    'css-loader',
+    {
+      loader: "postcss-loader",
+      options: {
+        postcssOptions: {
+          plugins: [
+            "postcss-preset-env", // 能解决大多数样式兼容性问题
+          ],
+        },
+      },
+    },
+    pre
+  ].filter(Boolean);
+}
+
 module.exports = {
   // 入口
   // 相对路径和绝对路径都行
@@ -26,36 +50,87 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        // use: [
+        //   // "style-loader", 
+        //   MiniCssExtractPlugin.loader,
+        //   "css-loader",
+        //   {
+        //     loader: "postcss-loader",
+        //     options: {
+        //       postcssOptions: {
+        //         plugins: [
+        //           "postcss-preset-env", // 能解决大多数样式兼容性问题
+        //         ],
+        //       },
+        //     },
+        //   },
+        // ],
+        use: getStyleLoaders()
       },
       {
         test: /\.less$/i,
         // loader: 'XXX'  // 只能使用一个loader use可以使用多个loader
-        use: [
-          // compiles Less to CSS
-          'style-loader',
-          'css-loader',
-          'less-loader',
-        ],
+        // use: [
+        //   // compiles Less to CSS
+        //   // 'style-loader',
+        //   MiniCssExtractPlugin.loader,
+        //   'css-loader',
+        //   {
+        //     loader: "postcss-loader",
+        //     options: {
+        //       postcssOptions: {
+        //         plugins: [
+        //           "postcss-preset-env", // 能解决大多数样式兼容性问题
+        //         ],
+        //       },
+        //     },
+        //   },
+        //   'less-loader',
+        // ],
+        use: getStyleLoaders('less-loader')
       },
       {
         test: /\.s[ac]ss$/i,
-        use: [
-          // 将 JS 字符串生成为 style 节点
-          'style-loader',
-          // 将 CSS 转化成 CommonJS 模块
-          'css-loader',
-          // 将 Sass 编译成 CSS
-          'sass-loader',
-        ],
+        // use: [
+        //   // 将 JS 字符串生成为 style 节点
+        //   // 'style-loader',
+        //   MiniCssExtractPlugin.loader,
+        //   // 将 CSS 转化成 CommonJS 模块
+        //   'css-loader',
+        //   {
+        //     loader: "postcss-loader",
+        //     options: {
+        //       postcssOptions: {
+        //         plugins: [
+        //           "postcss-preset-env", // 能解决大多数样式兼容性问题
+        //         ],
+        //       },
+        //     },
+        //   },
+        //   // 将 Sass 编译成 CSS
+        //   'sass-loader',
+        // ],
+        use: getStyleLoaders('sass-loader')
       },
       {
         test: /\.styl$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'stylus-loader',  // 将 Stylus 文件编译为 CSS
-        ],
+        // use: [
+        //   // 'style-loader',
+        //   MiniCssExtractPlugin.loader,
+        //   'css-loader',
+        //   {
+        //     loader: "postcss-loader",
+        //     options: {
+        //       postcssOptions: {
+        //         plugins: [
+        //           "postcss-preset-env", // 能解决大多数样式兼容性问题
+        //         ],
+        //       },
+        //     },
+        //   },
+        //   'stylus-loader',  // 将 Stylus 文件编译为 CSS
+        // ],
+        use: getStyleLoaders('stylus-loader')
       },
       {
         test: /\.(png|jpe?g|gif|webp)$/,
@@ -111,6 +186,12 @@ module.exports = {
       // template: path.resolve(__dirname, "./src/index.html"),
       template: path.resolve(__dirname, "../public/index.html"),
     }),
+    new MiniCssExtractPlugin({
+      // 自定义输出css文件的目录
+      filename: "static/css/main.css"
+    }),
+    // css压缩
+    new CssMinimizerPlugin(),
   ],
   // 生产模式不需要 devServer
   // // 开发服务器 运行在内存中的，并没有输出
