@@ -7,6 +7,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const PreloadWebpackPlugin = require("@vue/preload-webpack-plugin");
+const WorkboxPlugin = require('workbox-webpack-plugin');
 
 // 用来获取处理样式的loader
 function getStyleLoaders(pre) {
@@ -40,8 +42,10 @@ module.exports = {
     path: path.resolve(__dirname, "../dist"),
     // filename: 输出文件名
     // filename: "main.js",
-    filename: "static/js/[name].js",
-    chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    // filename: "static/js/[name].[contenthash:8].js",
+    // chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    filename: "static/js/[name].[contenthash:8].js",
+    chunkFilename: "static/js/[name].[contenthash:8].chunk.js", // 动态导入输出资源命名方式
     assetModuleFilename: "static/media/[name].[hash][ext]", // 图片、字体等资源命名方式（注意用hash）
     clean: true,  // 自动清空上次的打包结果 但是webpack4需要装一个插件
   },
@@ -211,8 +215,10 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       // 自定义输出css文件的目录
-      filename: "static/css/[name].css",
-      chunkFilename: "static/css/[name].chunk.css"
+      // filename: "static/css/[name].css",
+      // chunkFilename: "static/css/[name].chunk.css"
+      filename: "static/css/[name].[contenthash:8].css",
+      chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
     }),
     // // 下面的这几行也可以写在外面： optimization
     // // css压缩
@@ -220,6 +226,17 @@ module.exports = {
     // new TerserPlugin({
     //   parallel: threads // 开启多进程
     // }),
+    new PreloadWebpackPlugin({
+      rel: "preload", // preload兼容性更好
+      as: "script",
+      // rel: 'prefetch' // prefetch兼容性更差
+    }),
+    new WorkboxPlugin.GenerateSW({
+      // 这些选项帮助快速启用 ServiceWorkers
+      // 不允许遗留任何“旧的” ServiceWorkers
+      clientsClaim: true,
+      skipWaiting: true,
+    }),
   ],
   // 开发模式下，没有压缩，所以不需要处理下面的压缩
   optimization: {
@@ -239,7 +256,11 @@ module.exports = {
       // 其他的都用默认值
       // 1、如果我们将来用上了node_modules代码，他会把node_modules代码打包成一个单独的js文件。
       // 2、如果我们将来用上了动态导入语法，也会把动态导入的文件打包成单独的文件。
-    }
+    },
+    // 提取runtime文件
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
+    },
   },
   // 生产模式不需要 devServer
   // // 开发服务器 运行在内存中的，并没有输出
